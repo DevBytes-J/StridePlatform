@@ -1,5 +1,8 @@
 'use client';
 
+import Link from 'next/link';
+import Image from 'next/image';
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-white" style={{ margin: 0, padding: 0 }}>
@@ -7,24 +10,21 @@ export default function Home() {
       <header className="flex items-center justify-between px-6 lg:px-12 py-5 border-b border-[#1f1f1f] animate-fadeInDown" style={{ paddingLeft: '1.5rem', paddingRight: '1.5rem', paddingTop: '1.25rem', paddingBottom: '1.25rem' }}>
         <div className="flex items-center gap-12">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center hover:rotate-180 transition-transform duration-500">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#0d0d0d"/>
-                <path d="M2 17L12 22L22 17" stroke="#0d0d0d" strokeWidth="2"/>
-              </svg>
-            </div>
-            <span className="font-semibold">TourGuide</span>
+            <Image src="/logo.png" alt="Stride Logo" width={32} height={32} className="hover:scale-110 transition-transform duration-300" />
+            <span className="font-semibold">Stride</span>
           </div>
           <nav className="hidden md:flex gap-8 text-sm text-gray-400">
-            <a href="#" className="hover:text-white transition-all hover:-translate-y-1">Features</a>
-            <a href="#" className="hover:text-white transition-all hover:-translate-y-1">Pricing</a>
+            <a href="/features" className="hover:text-white transition-all hover:-translate-y-1">Features</a>
             <a href="/about" className="hover:text-white transition-all hover:-translate-y-1">About</a>
-            <a href="#" className="hover:text-white transition-all hover:-translate-y-1">Docs</a>
+            <a href="/docs" className="hover:text-white transition-all hover:-translate-y-1">Docs</a>
+            <a href="/contact" className="hover:text-white transition-all hover:-translate-y-1">Contact</a>
           </nav>
         </div>
-        <button className="px-5 py-2.5 bg-[#d4b896] text-black text-sm font-medium rounded-md hover:bg-[#c4a886] transition-all hover:scale-110 hover:shadow-lg">
-          Sign up
-        </button>
+        <a href="/signup">
+          <button className="px-5 py-2.5 bg-[#d4b896] text-black text-sm font-medium rounded-md hover:bg-[#c4a886] transition-all hover:scale-110 hover:shadow-lg cursor-pointer">
+            Sign up
+          </button>
+        </a>
       </header>
 
       {/* Hero Section */}
@@ -32,17 +32,19 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-16">
           <div className="max-w-2xl">
             <h1 className="text-5xl lg:text-7xl font-bold leading-[1.1] mb-6 tracking-tight animate-fadeInLeft">
-              Guide Your<br />Users, Step by<br />Step
+              Guide Your<br />Users, <span className="text-[#d4b896]">Step by<br />Step</span>
             </h1>
             <p className="text-gray-400 text-lg lg:text-xl mb-10 max-w-lg leading-relaxed animate-fadeInLeft delay-200">
               Create beautiful onboarding tours in minutes. No coding required, just
               clean elegance.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 animate-fadeInLeft delay-300">
-              <button className="px-7 py-3.5 bg-[#d4b896] text-black font-medium rounded-md hover:bg-[#c4a886] transition-all hover:scale-110 hover:shadow-2xl animate-glow">
-                Get Started Free
-              </button>
-              <button className="px-7 py-3.5 border border-[#2a2a2a] text-white font-medium rounded-md hover:bg-[#1a1a1a] transition-all hover:scale-105 hover:border-[#d4b896]">
+              <Link href="/signup">
+                <button className="px-7 py-3.5 bg-[#d4b896] text-black font-medium rounded-md hover:bg-[#c4a886] transition-all hover:scale-110 hover:shadow-2xl animate-glow cursor-pointer">
+                  Get Started Free
+                </button>
+              </Link>
+              <button className="px-7 py-3.5 border border-[#2a2a2a] text-white font-medium rounded-md hover:bg-[#1a1a1a] transition-all hover:scale-105 hover:border-[#d4b896] cursor-pointer">
                 Watch Demo
               </button>
             </div>
@@ -166,7 +168,7 @@ export default function Home() {
                     <div className="bg-[#0a0a0a] rounded-lg p-4 font-mono text-xs text-left">
                       <div className="text-gray-500 mb-2">// Add to your site</div>
                       <div className="text-[#d4b896]">&lt;script</div>
-                      <div className="text-gray-300 ml-4">src=<span className="text-green-400">"tourguide.js"</span></div>
+                      <div className="text-gray-300 ml-4">src=<span className="text-green-400">"stride.js"</span></div>
                       <div className="text-[#d4b896]">&gt;&lt;/script&gt;</div>
                     </div>
                   </div>
@@ -210,7 +212,7 @@ export default function Home() {
       <section className="px-6 lg:px-12 py-24 bg-black">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-4xl lg:text-5xl font-bold text-center mb-4 animate-fadeInUp">Try It Yourself</h2>
-          <p className="text-gray-400 text-center mb-16 text-lg animate-fadeInUp delay-100">Experience the magic of TourGuide in action</p>
+          <p className="text-gray-400 text-center mb-16 text-lg animate-fadeInUp delay-100">Experience the magic of Stride in action</p>
           
           <div className="bg-[#111111] border border-[#222222] rounded-2xl p-10 shadow-2xl hover:border-[#d4b896] transition-all animate-scaleIn delay-200">
             <div className="flex gap-2 mb-8">
@@ -246,7 +248,7 @@ export default function Home() {
             </div>
             
             <div className="text-center">
-              <button className="px-8 py-4 bg-[#d4b896] text-black font-semibold rounded-lg hover:bg-[#c4a886] transition-all hover:scale-110 shadow-lg animate-glow hover:shadow-2xl">
+              <button className="px-8 py-4 bg-[#d4b896] text-black font-semibold rounded-lg hover:bg-[#c4a886] transition-all hover:scale-110 shadow-lg animate-glow hover:shadow-2xl cursor-pointer">
                 ▶ Start Demo Tour
               </button>
             </div>
@@ -260,13 +262,8 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#0d0d0d"/>
-                    <path d="M2 17L12 22L22 17" stroke="#0d0d0d" strokeWidth="2"/>
-                  </svg>
-                </div>
-                <span className="font-semibold">TourGuide</span>
+                <Image src="/logo.png" alt="Stride Logo" width={32} height={32} />
+                <span className="font-semibold">Stride</span>
               </div>
               <p className="text-sm text-gray-400 leading-relaxed">Elevating user experiences, one tour at a time</p>
             </div>
@@ -274,9 +271,7 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-3 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Tutorials</a></li>
+                <li><a href="/features" className="hover:text-white transition-colors">Features</a></li>
               </ul>
             </div>
             
@@ -284,23 +279,20 @@ export default function Home() {
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-3 text-sm text-gray-400">
                 <li><a href="/about" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Resources</h4>
               <ul className="space-y-3 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Docs</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
+                <li><a href="/docs" className="hover:text-white transition-colors">Docs</a></li>
               </ul>
             </div>
           </div>
           
           <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-[#1f1f1f] gap-4">
-            <p className="text-sm text-gray-400">© 2025 TourGuide. All rights reserved.</p>
+            <p className="text-sm text-gray-400">© 2025 Stride. All rights reserved.</p>
             <div className="flex gap-6">
               <a href="#" className="text-gray-400 hover:text-[#d4b896] transition-all hover:scale-125 hover:-translate-y-1">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
