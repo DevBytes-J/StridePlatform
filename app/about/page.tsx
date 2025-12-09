@@ -1,37 +1,38 @@
 'use client';
 
+import Link from 'next/link';
+import Image from 'next/image';
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-white">
       {/* Header */}
       <header className="flex items-center justify-between px-6 lg:px-12 py-5 border-b border-[#1f1f1f] animate-fadeInDown">
         <div className="flex items-center gap-12">
-          <a href="/" className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center hover:rotate-180 transition-transform duration-500">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#0d0d0d"/>
-                <path d="M2 17L12 22L22 17" stroke="#0d0d0d" strokeWidth="2"/>
-              </svg>
-            </div>
-            <span className="font-semibold">TourGuide</span>
-          </a>
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/logo.png" alt="Stride Logo" width={32} height={32} />
+            <span className="font-semibold">Stride</span>
+          </Link>
           <nav className="hidden md:flex gap-8 text-sm text-gray-400">
-            <a href="/" className="hover:text-white transition-all hover:-translate-y-1">Home</a>
-            <a href="#" className="hover:text-white transition-all hover:-translate-y-1">Features</a>
-            <a href="#" className="hover:text-white transition-all hover:-translate-y-1">Pricing</a>
-            <a href="#" className="hover:text-white transition-all hover:-translate-y-1">Docs</a>
+            <Link href="/" className="hover:text-white transition-all hover:-translate-y-1">Home</Link>
+            <Link href="/features" className="hover:text-white transition-all hover:-translate-y-1">Features</Link>
+            <Link href="/about" className="text-white">About</Link>
+            <Link href="/docs" className="hover:text-white transition-all hover:-translate-y-1">Docs</Link>
+            <Link href="/contact" className="hover:text-white transition-all hover:-translate-y-1">Contact</Link>
           </nav>
         </div>
-        <button className="px-5 py-2.5 bg-[#d4b896] text-black text-sm font-medium rounded-md hover:bg-[#c4a886] transition-all hover:scale-110 hover:shadow-lg">
-          Get Started
-        </button>
+        <Link href="/signup">
+          <button className="px-5 py-2.5 bg-[#d4b896] text-black text-sm font-medium rounded-md hover:bg-[#c4a886] transition-all hover:scale-110 hover:shadow-lg cursor-pointer">
+            Get Started
+          </button>
+        </Link>
       </header>
 
       {/* Hero Section */}
       <section className="px-6 lg:px-12 pt-32 pb-20">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl lg:text-7xl font-bold leading-tight mb-6 animate-fadeInUp">
-            About TourGuide
+            About Stride
           </h1>
           <p className="text-gray-400 text-xl lg:text-2xl leading-relaxed animate-fadeInUp delay-100">
             We're on a mission to make user onboarding simple, beautiful, and effective for everyone.
@@ -45,13 +46,13 @@ export default function AboutPage() {
           <div className="animate-fadeInLeft">
             <h2 className="text-4xl font-bold mb-6">Our Story</h2>
             <p className="text-gray-400 text-lg leading-relaxed mb-6">
-              TourGuide was born from a simple frustration: creating user onboarding tours was too complicated, too time-consuming, and required too much technical knowledge.
+              Stride was born from a simple frustration: creating user onboarding tours was too complicated, too time-consuming, and required too much technical knowledge.
             </p>
             <p className="text-gray-400 text-lg leading-relaxed mb-6">
               We believed there had to be a better way. A way that would let anyone create beautiful, engaging tours without writing a single line of code.
             </p>
             <p className="text-gray-400 text-lg leading-relaxed">
-              Today, thousands of companies trust TourGuide to help their users discover and love their products.
+              Today, thousands of companies trust Stride to help their users discover and love their products.
             </p>
           </div>
           <div className="animate-fadeInRight delay-200">
@@ -131,7 +132,7 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl lg:text-5xl font-bold text-center mb-6 animate-fadeInUp">Meet Our Team</h2>
           <p className="text-gray-400 text-center mb-16 text-lg animate-fadeInUp delay-100">
-            The passionate people behind TourGuide
+            The passionate people behind Stride
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -190,10 +191,10 @@ export default function AboutPage() {
             Be part of the revolution in user onboarding. Start creating amazing tours today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fadeInUp delay-200">
-            <button className="px-8 py-4 bg-[#d4b896] text-black font-semibold rounded-lg hover:bg-[#c4a886] transition-all hover:scale-110 shadow-lg animate-glow">
+            <button className="px-8 py-4 bg-[#d4b896] text-black font-semibold rounded-lg hover:bg-[#c4a886] transition-all hover:scale-110 shadow-lg animate-glow cursor-pointer">
               Get Started Free
             </button>
-            <button className="px-8 py-4 border border-[#2a2a2a] text-white font-semibold rounded-lg hover:bg-[#1a1a1a] transition-all hover:scale-105 hover:border-[#d4b896]">
+            <button className="px-8 py-4 border border-[#2a2a2a] text-white font-semibold rounded-lg hover:bg-[#1a1a1a] transition-all hover:scale-105 hover:border-[#d4b896] cursor-pointer">
               Contact Sales
             </button>
           </div>
@@ -206,13 +207,8 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#0d0d0d"/>
-                    <path d="M2 17L12 22L22 17" stroke="#0d0d0d" strokeWidth="2"/>
-                  </svg>
-                </div>
-                <span className="font-semibold">TourGuide</span>
+                <Image src="/logo.png" alt="Stride Logo" width={32} height={32} />
+                <span className="font-semibold">Stride</span>
               </div>
               <p className="text-sm text-gray-400 leading-relaxed">Elevating user experiences, one tour at a time</p>
             </div>
@@ -220,9 +216,7 @@ export default function AboutPage() {
             <div>
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-3 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Tutorials</a></li>
+                <li><a href="/features" className="hover:text-white transition-colors">Features</a></li>
               </ul>
             </div>
             
@@ -230,23 +224,20 @@ export default function AboutPage() {
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-3 text-sm text-gray-400">
                 <li><a href="/about" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Resources</h4>
               <ul className="space-y-3 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Docs</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
+                <li><a href="/docs" className="hover:text-white transition-colors">Docs</a></li>
               </ul>
             </div>
           </div>
           
           <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-[#1f1f1f] gap-4">
-            <p className="text-sm text-gray-400">© 2025 TourGuide. All rights reserved.</p>
+            <p className="text-sm text-gray-400">© 2025 Stride. All rights reserved.</p>
             <div className="flex gap-6">
               <a href="#" className="text-gray-400 hover:text-[#d4b896] transition-all hover:scale-125 hover:-translate-y-1">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

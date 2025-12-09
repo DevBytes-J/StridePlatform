@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TourGuide - Guide Your Users, Step by Step",
+  title: "Stride - Guide Your Users, Step by Step",
   description: "Create beautiful onboarding tours in minutes. No coding required, just clean elegance.",
 };
 
