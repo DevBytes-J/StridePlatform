@@ -74,7 +74,7 @@ export default function Dashboard() {
 
   const handleGenerateEmbed = (tour: Tour) => {
     const embedCode = `<!-- Stride Tour Widget -->
-<script src="https://stridecore.vercel.app/embed.js" data-tour-id="${tour.id}"></script>`;
+<script src="https://stride-core.vercel.app/embed.js" data-tour-id="${tour.id}"></script>`;
     
     navigator.clipboard.writeText(embedCode);
     toast.success('Embed code copied to clipboard!');
