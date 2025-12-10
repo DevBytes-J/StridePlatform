@@ -2,16 +2,27 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState } from 'react';
 
 export default function Home() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-white" style={{ margin: 0, padding: 0 }}>
       {/* Header */}
       <header className="flex items-center justify-between px-6 lg:px-12 py-5 border-b border-[#1f1f1f] animate-fadeInDown" style={{ paddingLeft: '1.5rem', paddingRight: '1.5rem', paddingTop: '1.25rem', paddingBottom: '1.25rem' }}>
         <div className="flex items-center gap-12">
           <div className="flex items-center gap-2">
+            {/* Menu Button */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="lg:hidden p-2 text-white hover:text-[#d4b896] transition-colors cursor-pointer"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
             <Image src="/logo.png" alt="Stride Logo" width={32} height={32} className="hover:scale-110 transition-transform duration-300" />
-            <span className="font-semibold">Stride</span>
           </div>
           <nav className="hidden md:flex gap-8 text-sm text-gray-400">
             <a href="/features" className="hover:text-white transition-all hover:-translate-y-1">Features</a>
@@ -20,12 +31,42 @@ export default function Home() {
             <a href="/contact" className="hover:text-white transition-all hover:-translate-y-1">Contact</a>
           </nav>
         </div>
-        <a href="/signup">
-          <button className="px-5 py-2.5 bg-[#d4b896] text-black text-sm font-medium rounded-md hover:bg-[#c4a886] transition-all hover:scale-110 hover:shadow-lg cursor-pointer">
-            Sign up
-          </button>
-        </a>
+        <div className="flex items-center gap-4">
+          <a href="/login" className="hidden md:block text-sm text-gray-400 hover:text-white">Login</a>
+          <a href="/signup">
+            <button className="px-5 py-2.5 bg-[#d4b896] text-black text-sm font-medium rounded-md hover:bg-[#c4a886] transition-all hover:scale-110 hover:shadow-lg cursor-pointer">
+              Sign up
+            </button>
+          </a>
+        </div>
       </header>
+
+      {/* Mobile Sidebar */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 z-40"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+      
+      <div className={`fixed top-0 left-0 h-full w-64 bg-[#d4b896] transform transition-transform duration-300 z-50 ${
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="p-4 border-b border-black flex justify-between items-center">
+          <Image src="/logo.png" alt="Stride Logo" width={32} height={32} />
+          <button onClick={() => setIsOpen(false)} className="text-black hover:text-gray-700 cursor-pointer">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <nav className="p-4 space-y-2">
+          <a href="/" onClick={() => setIsOpen(false)} className="block px-4 py-2 rounded-md bg-black text-[#d4b896]">Home</a>
+          <a href="/about" onClick={() => setIsOpen(false)} className="block px-4 py-2 rounded-md text-black hover:bg-[#c4a886]">About</a>
+          <a href="/login" onClick={() => setIsOpen(false)} className="block px-4 py-2 rounded-md text-black hover:bg-[#c4a886]">Login</a>
+          <a href="/signup" onClick={() => setIsOpen(false)} className="block px-4 py-2 rounded-md text-black hover:bg-[#c4a886]">Sign Up</a>
+        </nav>
+      </div>
 
       {/* Hero Section */}
       <section className="px-6 lg:px-12 pt-24 pb-32" style={{ paddingLeft: '1.5rem', paddingRight: '1.5rem', paddingTop: '6rem', paddingBottom: '8rem' }}>
@@ -163,7 +204,7 @@ export default function Home() {
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-12 h-12 bg-[#d4b896] text-black rounded-full flex items-center justify-center font-bold text-lg z-10 shadow-lg group-hover:scale-125 transition-transform">
                   2
                 </div>
-                <div className="w-full h-56 bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-xl border border-[#2a2a2a] overflow-hidden group-hover:border-[#d4b896] transition-all group-hover:scale-105 group-hover:shadow-2xl">
+                <div className="w-full h-56 bg-linear-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-xl border border-[#2a2a2a] overflow-hidden group-hover:border-[#d4b896] transition-all group-hover:scale-105 group-hover:shadow-2xl">
                   <div className="p-6 h-full flex flex-col justify-center">
                     <div className="bg-[#0a0a0a] rounded-lg p-4 font-mono text-xs text-left">
                       <div className="text-gray-500 mb-2">// Add to your site</div>
@@ -227,7 +268,7 @@ export default function Home() {
                 <span className="text-3xl font-bold">12,458</span>
               </div>
               <div className="w-full h-3 bg-[#1a1a1a] rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-[#d4b896] to-[#b89968] w-3/4 rounded-full transition-all duration-1000"></div>
+                <div className="h-full bg-linear-to-r from-[#d4b896] to-[#b89968] w-3/4 rounded-full transition-all duration-1000"></div>
               </div>
               
               <div className="flex justify-between items-center py-4 border-b border-[#1f1f1f]">
@@ -235,7 +276,7 @@ export default function Home() {
                 <span className="text-3xl font-bold">23</span>
               </div>
               <div className="w-full h-3 bg-[#1a1a1a] rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-[#d4b896] to-[#b89968] w-1/4 rounded-full transition-all duration-1000"></div>
+                <div className="h-full bg-linear-to-r from-[#d4b896] to-[#b89968] w-1/4 rounded-full transition-all duration-1000"></div>
               </div>
               
               <div className="flex justify-between items-center py-4 border-b border-[#1f1f1f]">
@@ -243,7 +284,7 @@ export default function Home() {
                 <span className="text-3xl font-bold">94%</span>
               </div>
               <div className="w-full h-3 bg-[#1a1a1a] rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-[#d4b896] to-[#b89968] w-[94%] rounded-full transition-all duration-1000"></div>
+                <div className="h-full bg-linear-to-r from-[#d4b896] to-[#b89968] w-[94%] rounded-full transition-all duration-1000"></div>
               </div>
             </div>
             

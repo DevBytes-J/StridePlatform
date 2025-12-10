@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import MobileSidebar from '@/components/MobileSidebar';
 
 export default function AboutPage() {
   return (
@@ -9,10 +10,13 @@ export default function AboutPage() {
       {/* Header */}
       <header className="flex items-center justify-between px-6 lg:px-12 py-5 border-b border-[#1f1f1f] animate-fadeInDown">
         <div className="flex items-center gap-12">
-          <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Stride Logo" width={32} height={32} />
-            <span className="font-semibold">Stride</span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <MobileSidebar currentPage="about" />
+            <Link href="/" className="flex items-center gap-2">
+              <Image src="/logo.png" alt="Stride Logo" width={32} height={32} />
+              <span className="font-semibold">Stride</span>
+            </Link>
+          </div>
           <nav className="hidden md:flex gap-8 text-sm text-gray-400">
             <Link href="/" className="hover:text-white transition-all hover:-translate-y-1">Home</Link>
             <Link href="/features" className="hover:text-white transition-all hover:-translate-y-1">Features</Link>
@@ -56,7 +60,7 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="animate-fadeInRight delay-200">
-            <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl border border-[#2a2a2a] p-12 hover:border-[#d4b896] transition-all hover:scale-105">
+            <div className="bg-linear-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl border border-[#2a2a2a] p-12 hover:border-[#d4b896] transition-all hover:scale-105">
               <div className="grid grid-cols-2 gap-8 text-center">
                 <div className="animate-scaleIn delay-300">
                   <div className="text-5xl font-bold text-[#d4b896] mb-2">10K+</div>
@@ -137,7 +141,7 @@ export default function AboutPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center group animate-scaleIn delay-200">
-              <div className="w-32 h-32 bg-gradient-to-br from-[#d4b896] to-[#b89968] rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-32 h-32 bg-linear-to-br from-[#d4b896] to-[#b89968] rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <svg className="w-16 h-16 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
@@ -148,7 +152,7 @@ export default function AboutPage() {
             </div>
 
             <div className="text-center group animate-scaleIn delay-300">
-              <div className="w-32 h-32 bg-gradient-to-br from-[#d4b896] to-[#b89968] rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-32 h-32 bg-linear-to-br from-[#d4b896] to-[#b89968] rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <svg className="w-16 h-16 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
@@ -159,7 +163,7 @@ export default function AboutPage() {
             </div>
 
             <div className="text-center group animate-scaleIn delay-400">
-              <div className="w-32 h-32 bg-gradient-to-br from-[#d4b896] to-[#b89968] rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-32 h-32 bg-linear-to-br from-[#d4b896] to-[#b89968] rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <svg className="w-16 h-16 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
@@ -170,7 +174,7 @@ export default function AboutPage() {
             </div>
 
             <div className="text-center group animate-scaleIn delay-500">
-              <div className="w-32 h-32 bg-gradient-to-br from-[#d4b896] to-[#b89968] rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-32 h-32 bg-linear-to-br from-[#d4b896] to-[#b89968] rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <svg className="w-16 h-16 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
