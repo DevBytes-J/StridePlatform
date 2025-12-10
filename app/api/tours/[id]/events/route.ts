@@ -14,21 +14,33 @@ export async function POST(
 
     // Update tour analytics based on event type
     if (eventType === 'tour_started') {
-      // Increment views
-      await supabase
+      // Get current views and increment
+      const { data: tour } = await supabase
         .from('tours')
-        .update({ 
-          views: supabase.sql`views + 1`
-        })
-        .eq('id', id);
+        .select('views')
+        .eq('id', id)
+        .single();
+      
+      if (tour) {
+        await supabase
+          .from('tours')
+          .update({ views: (tour.views || 0) + 1 })
+          .eq('id', id);
+      }
     } else if (eventType === 'tour_completed') {
-      // Increment completions
-      await supabase
+      // Get current completions and increment
+      const { data: tour } = await supabase
         .from('tours')
-        .update({ 
-          completions: supabase.sql`completions + 1`
-        })
-        .eq('id', id);
+        .select('completions')
+        .eq('id', id)
+        .single();
+      
+      if (tour) {
+        await supabase
+          .from('tours')
+          .update({ completions: (tour.completions || 0) + 1 })
+          .eq('id', id);
+      }
     }
 
     return NextResponse.json({ success: true }, {
