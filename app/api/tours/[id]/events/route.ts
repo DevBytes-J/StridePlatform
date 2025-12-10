@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase';
 
 export async function POST(
   request: NextRequest,
@@ -7,12 +8,28 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
+    const { eventType, stepId } = body;
     
-    // For now, just log the event (you can add database storage later)
-    console.log('Tour event:', {
-      tourId: id,
-      event: body
-    });
+    console.log('Tour event:', { tourId: id, eventType, stepId });
+
+    // Update tour analytics based on event type
+    if (eventType === 'tour_started') {
+      // Increment views
+      await supabase
+        .from('tours')
+        .update({ 
+          views: supabase.sql`views + 1`
+        })
+        .eq('id', id);
+    } else if (eventType === 'tour_completed') {
+      // Increment completions
+      await supabase
+        .from('tours')
+        .update({ 
+          completions: supabase.sql`completions + 1`
+        })
+        .eq('id', id);
+    }
 
     return NextResponse.json({ success: true }, {
       headers: {
@@ -22,6 +39,7 @@ export async function POST(
       },
     });
   } catch (error) {
+    console.error('Failed to track event:', error);
     return NextResponse.json({ error: 'Failed to track event' }, { status: 500 });
   }
 }
