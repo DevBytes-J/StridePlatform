@@ -10,24 +10,42 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { data: tour, error } = await supabase
+    // First, let's see what tours exist
+    const { data: allTours, error: allError } = await supabase
+      .from('tours')
+      .select('id, title, status')
+      .limit(5);
+
+    // Then try to find the specific tour
+    const { data: tours, error } = await supabase
       .from('tours')
       .select('*')
-      .eq('id', tourId)
-      .single();
+      .eq('id', tourId);
 
-    if (error || !tour) {
+    if (error) {
+      return NextResponse.json({ 
+        error: 'Database error',
+        details: error.message,
+        allTours: allTours || []
+      }, { status: 500 });
+    }
+
+    if (!tours || tours.length === 0) {
       return NextResponse.json({ 
         error: 'Tour not found',
         tourId: tourId,
-        details: error?.message 
+        availableTours: allTours || [],
+        message: 'No tour exists with this ID'
       }, { status: 404 });
     }
+
+    const tour = tours[0];
 
     if (tour.status !== 'active') {
       return NextResponse.json({ 
         error: 'Tour not active',
-        status: tour.status 
+        status: tour.status,
+        availableTours: allTours || []
       }, { status: 404 });
     }
 
