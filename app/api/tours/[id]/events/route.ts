@@ -10,40 +10,18 @@ export async function POST(
     const body = await request.json();
     const { eventType, stepId } = body;
     
-    console.log('Tour event:', { tourId: id, eventType, stepId });
+    console.log('=== ANALYTICS EVENT ===');
+    console.log('Tour ID:', id);
+    console.log('Event Type:', eventType);
+    console.log('Step ID:', stepId);
+    console.log('======================');
 
-    // Update tour analytics based on event type
-    if (eventType === 'tour_started') {
-      // Get current views and increment
-      const { data: tour } = await supabase
-        .from('tours')
-        .select('views')
-        .eq('id', id)
-        .single();
-      
-      if (tour) {
-        await supabase
-          .from('tours')
-          .update({ views: (tour.views || 0) + 1 })
-          .eq('id', id);
-      }
-    } else if (eventType === 'tour_completed') {
-      // Get current completions and increment
-      const { data: tour } = await supabase
-        .from('tours')
-        .select('completions')
-        .eq('id', id)
-        .single();
-      
-      if (tour) {
-        await supabase
-          .from('tours')
-          .update({ completions: (tour.completions || 0) + 1 })
-          .eq('id', id);
-      }
-    }
-
-    return NextResponse.json({ success: true }, {
+    // Simple test - just return success for now
+    return NextResponse.json({ 
+      success: true, 
+      received: { tourId: id, eventType, stepId },
+      timestamp: new Date().toISOString()
+    }, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST',
@@ -52,7 +30,10 @@ export async function POST(
     });
   } catch (error) {
     console.error('Failed to track event:', error);
-    return NextResponse.json({ error: 'Failed to track event' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to track event',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
 
