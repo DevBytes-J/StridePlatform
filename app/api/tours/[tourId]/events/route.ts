@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { tourId: string } }
+  { params }: { params: Promise<{ tourId: string }> }
 ) {
-  const tourId = params.tourId;
+  const { tourId } = await params;
   
   try {
     const body = await request.json();

@@ -19,9 +19,9 @@ const tours = {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { tourId: string } }
+  { params }: { params: Promise<{ tourId: string }> }
 ) {
-  const tourId = params.tourId;
+  const { tourId } = await params;
   const tour = tours[tourId as keyof typeof tours];
 
   if (!tour) {
