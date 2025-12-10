@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import toast, { Toaster } from 'react-hot-toast';
+import MobileSidebar from '@/components/MobileSidebar';
 
 interface Step {
   id: string;
@@ -26,40 +27,29 @@ export default function NewTour() {
   });
   const [saving, setSaving] = useState(false);
   const router = useRouter();
-  const topRef = useRef<HTMLDivElement>(null);
-  const selectorRef = useRef<HTMLInputElement>(null);
-  const stepTitleRef = useRef<HTMLInputElement>(null);
-  const contentRef = useRef<HTMLTextAreaElement>(null);
-  const positionRef = useRef<HTMLSelectElement>(null);
+
+  const generateUniqueId = () => {
+    return `step-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  };
 
   const addStep = () => {
     if (!currentStep.selector || !currentStep.title || !currentStep.content) {
       toast.error('Fill all step fields');
       return;
     }
-    setSteps([...steps, { ...currentStep, id: Date.now().toString() }]);
+    
+    const newStep = { 
+      ...currentStep, 
+      id: generateUniqueId()
+    };
+    
+    setSteps([...steps, newStep]);
     setCurrentStep({ id: '', selector: '', title: '', content: '', position: 'bottom' });
     toast.success('Step added');
-    topRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const removeStep = (id: string) => {
     setSteps(steps.filter(s => s.id !== id));
-  };
-
-  const handleSelectorChange = (value: string) => {
-    setCurrentStep({...currentStep, selector: value});
-    if (value) stepTitleRef.current?.focus();
-  };
-
-  const handleStepTitleChange = (value: string) => {
-    setCurrentStep({...currentStep, title: value});
-    if (value) contentRef.current?.focus();
-  };
-
-  const handleContentChange = (value: string) => {
-    setCurrentStep({...currentStep, content: value});
-    if (value) positionRef.current?.focus();
   };
 
   const saveTour = async (status: 'draft' | 'active') => {
@@ -67,8 +57,8 @@ export default function NewTour() {
       toast.error('Tour title is required');
       return;
     }
-    if (steps.length === 0) {
-      toast.error('Add at least one step');
+    if (steps.length < 5) {
+      toast.error('Tour must have at least 5 steps');
       return;
     }
 
@@ -102,8 +92,9 @@ export default function NewTour() {
       <Toaster position="top-center" />
       
       {/* Top Bar */}
-      <div ref={topRef} className="border-b border-[#2a2a2a] px-8 py-4 flex items-center justify-between">
+      <div className="border-b border-[#2a2a2a] px-8 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
+          <MobileSidebar currentPage="dashboard" />
           <button 
             onClick={() => router.push('/dashboard')}
             className="text-gray-400 hover:text-white cursor-pointer"
@@ -112,7 +103,7 @@ export default function NewTour() {
           </button>
           <h1 className="text-2xl font-bold">Create New Tour</h1>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-3">
           <button 
             onClick={() => saveTour('draft')}
             disabled={saving}
@@ -136,7 +127,7 @@ export default function NewTour() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-8 p-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
         {/* Left: Tour Details */}
         <div className="space-y-6">
           <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
@@ -171,10 +162,9 @@ export default function NewTour() {
               <div>
                 <label className="block text-sm font-medium mb-2">CSS Selector</label>
                 <input
-                  ref={selectorRef}
                   type="text"
                   value={currentStep.selector}
-                  onChange={(e) => handleSelectorChange(e.target.value)}
+                  onChange={(e) => setCurrentStep({...currentStep, selector: e.target.value})}
                   className="w-full px-4 py-3 bg-[#0d0d0d] border border-[#2a2a2a] rounded-md focus:outline-none focus:border-[#d4b896]"
                   placeholder="#signup-button"
                 />
@@ -183,10 +173,9 @@ export default function NewTour() {
               <div>
                 <label className="block text-sm font-medium mb-2">Step Title</label>
                 <input
-                  ref={stepTitleRef}
                   type="text"
                   value={currentStep.title}
-                  onChange={(e) => handleStepTitleChange(e.target.value)}
+                  onChange={(e) => setCurrentStep({...currentStep, title: e.target.value})}
                   className="w-full px-4 py-3 bg-[#0d0d0d] border border-[#2a2a2a] rounded-md focus:outline-none focus:border-[#d4b896]"
                   placeholder="Create Your Account"
                 />
@@ -194,9 +183,8 @@ export default function NewTour() {
               <div>
                 <label className="block text-sm font-medium mb-2">Content</label>
                 <textarea
-                  ref={contentRef}
                   value={currentStep.content}
-                  onChange={(e) => handleContentChange(e.target.value)}
+                  onChange={(e) => setCurrentStep({...currentStep, content: e.target.value})}
                   className="w-full px-4 py-3 bg-[#0d0d0d] border border-[#2a2a2a] rounded-md focus:outline-none focus:border-[#d4b896] h-24 resize-none"
                   placeholder="Click here to sign up and get started..."
                 />
@@ -204,7 +192,6 @@ export default function NewTour() {
               <div>
                 <label className="block text-sm font-medium mb-2">Tooltip Position</label>
                 <select
-                  ref={positionRef}
                   value={currentStep.position}
                   onChange={(e) => setCurrentStep({...currentStep, position: e.target.value as any})}
                   className="w-full px-4 py-3 bg-[#0d0d0d] border border-[#2a2a2a] rounded-md focus:outline-none focus:border-[#d4b896] cursor-pointer"
@@ -212,7 +199,6 @@ export default function NewTour() {
                   <option value="top">Top</option>
                   <option value="bottom">Bottom</option>
                   <option value="left">Left</option>
-                  <option value="right">Right</option>
                   <option value="right">Right</option>
                 </select>
               </div>
@@ -228,9 +214,14 @@ export default function NewTour() {
 
         {/* Right: Steps Preview */}
         <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4">Tour Steps ({steps.length})</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Tour Steps ({steps.length}/5 minimum)</h2>
+            {steps.length < 5 && (
+              <span className="text-red-500 text-sm">Need {5 - steps.length} more steps</span>
+            )}
+          </div>
           {steps.length === 0 ? (
-            <p className="text-gray-400 text-center py-8">No steps added yet</p>
+            <p className="text-gray-400 text-center py-8">No steps added yet. Add at least 5 steps to create a tour.</p>
           ) : (
             <div className="space-y-3">
               {steps.map((step, index) => (
@@ -251,6 +242,7 @@ export default function NewTour() {
                   </div>
                   <p className="text-sm text-gray-400 mb-2">{step.content}</p>
                   <div className="flex gap-4 text-xs text-gray-500">
+                    <span>ID: <code className="text-[#d4b896]">{step.id}</code></span>
                     <span>Selector: <code className="text-[#d4b896]">{step.selector}</code></span>
                     <span>Position: {step.position}</span>
                   </div>

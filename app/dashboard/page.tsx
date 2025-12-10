@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import toast, { Toaster } from 'react-hot-toast';
+import MobileSidebar from '@/components/MobileSidebar';
+import Modal from '@/components/Modal';
 
 interface Tour {
   id: string;
@@ -26,7 +28,24 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [deleteModal, setDeleteModal] = useState<{isOpen: boolean, tourId: string, tourTitle: string}>({
+    isOpen: false, tourId: '', tourTitle: ''
+  });
+  const [logoutModal, setLogoutModal] = useState(false);
   const router = useRouter();
+
+  const totalTours = tours.length;
+  const activeUsers = tours.reduce((sum, tour) => sum + tour.views, 0);
+  const avgCompletion = tours.length > 0 
+    ? Math.round(tours.reduce((sum, tour) => sum + (tour.views > 0 ? (tour.completions / tour.views) * 100 : 0), 0) / tours.length)
+    : 0;
+
+  const filteredTours = tours.filter(tour => {
+    const matchesSearch = tour.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         (tour.description && tour.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesStatus = statusFilter === 'all' || tour.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   useEffect(() => {
     fetchTours();
@@ -46,60 +65,44 @@ export default function Dashboard() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching tours:', error);
-      setTours([]);
+      toast.error('Failed to fetch tours');
     } else {
       setTours(data || []);
     }
     setLoading(false);
   };
 
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      router.push('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-      router.push('/login');
-    }
+  const handleGenerateEmbed = (tour: Tour) => {
+    const embedCode = `<!-- Stride Tour Widget -->
+<script src="https://stridecore.vercel.app/embed.js" data-tour-id="${tour.id}"></script>`;
+    
+    navigator.clipboard.writeText(embedCode);
+    toast.success('Embed code copied to clipboard!');
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this tour?')) return;
-
-    const { error } = await supabase.from('tours').delete().eq('id', id);
+  const handleDelete = async (tourId: string) => {
+    const { error } = await supabase.from('tours').delete().eq('id', tourId);
     if (error) {
       toast.error('Failed to delete tour');
     } else {
       toast.success('Tour deleted');
-      setTours(tours.filter(t => t.id !== id));
-    }
-  };
-
-  const handleDuplicate = async (tour: Tour) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    const { error } = await supabase.from('tours').insert({
-      user_id: user?.id,
-      title: `${tour.title} (Copy)`,
-      description: tour.description,
-      status: 'draft',
-      steps: tour.steps,
-    });
-
-    if (error) {
-      toast.error('Failed to duplicate tour');
-    } else {
-      toast.success('Tour duplicated');
       fetchTours();
     }
+    setDeleteModal({isOpen: false, tourId: '', tourTitle: ''});
   };
 
-  const handlePublish = async (id: string) => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+    setLogoutModal(false);
+  };
+
+  const handlePublish = async (tourId: string) => {
     const { error } = await supabase
       .from('tours')
       .update({ status: 'active' })
-      .eq('id', id);
-
+      .eq('id', tourId);
+    
     if (error) {
       toast.error('Failed to publish tour');
     } else {
@@ -108,37 +111,27 @@ export default function Dashboard() {
     }
   };
 
-  const filteredTours = tours.filter(tour => {
-    const matchesSearch = tour.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || tour.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
-  const totalTours = tours.length;
-  const activeUsers = tours.reduce((sum, t) => sum + t.views, 0);
-  const avgCompletion = tours.length > 0
-    ? Math.round(tours.reduce((sum, t) => sum + (t.views > 0 ? (t.completions / t.views) * 100 : 0), 0) / tours.length)
-    : 0;
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}m ${secs}s`;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const formatDate = (date: string) => {
-    const d = new Date(date);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  };
-
-  const getTimeAgo = (date: string) => {
-    const diff = Date.now() - new Date(date).getTime();
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    if (days === 0) return 'Today';
-    if (days === 1) return '1 day ago';
-    if (days < 7) return `${days} days ago`;
-    if (days < 14) return '1 week ago';
-    return `${Math.floor(days / 7)} weeks ago`;
+  const getTimeAgo = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays === 0) return 'Today';
+    if (diffInDays === 1) return '1 day ago';
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+    if (diffInDays < 14) return '1 week ago';
+    return `${Math.floor(diffInDays / 7)} weeks ago`;
   };
 
   return (
@@ -149,31 +142,23 @@ export default function Dashboard() {
       <nav className="border-b border-[#2a2a2a] px-8 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2">
-              <img src="/logo.png" alt="Stride" className="w-8 h-8" />
-              <span className="text-xl font-bold">Stride</span>
-            </div>
-            <div className="flex gap-6">
+            <img src="/logo.png" alt="Stride" className="w-8 h-8" />
+            <div className="hidden md:flex gap-6">
               <button className="text-white border-b-2 border-[#d4b896] pb-1 cursor-pointer">Tours</button>
               <button onClick={() => router.push('/dashboard/analytics')} className="text-gray-400 hover:text-white transition-colors cursor-pointer">Analytics</button>
               <button onClick={() => router.push('/dashboard/settings')} className="text-gray-400 hover:text-white transition-colors cursor-pointer">Settings</button>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <button 
-              onClick={handleLogout}
-              className="px-4 py-2 border border-[#2a2a2a] text-white rounded-md hover:bg-[#1a1a1a] transition-colors cursor-pointer"
-            >
-              Logout
-            </button>
-            <button 
-              onClick={() => router.push('/dashboard/settings')}
-              className="w-10 h-10 bg-[#d4b896] rounded-md hover:bg-[#c4a886] transition-colors cursor-pointer flex items-center justify-center"
-            >
-              <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </button>
+            <div className="hidden md:flex">
+              <button 
+                onClick={() => setLogoutModal(true)}
+                className="px-4 py-2 border border-[#2a2a2a] text-white rounded-md hover:bg-[#1a1a1a] transition-colors cursor-pointer"
+              >
+                Logout
+              </button>
+            </div>
+            <MobileSidebar currentPage="dashboard" />
           </div>
         </div>
       </nav>
@@ -181,32 +166,34 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="px-8 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold mb-2">My Tours</h1>
-            <p className="text-gray-400">Manage and track your onboarding experiences</p>
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">My Tours</h1>
+              <p className="text-gray-400">Manage and track your onboarding experiences</p>
+            </div>
           </div>
           <button 
             onClick={() => router.push('/dashboard/tours/new')}
-            className="px-6 py-3 bg-[#d4b896] text-black font-medium rounded-md hover:bg-[#c4a886] transition-all cursor-pointer"
+            className="w-full md:w-auto px-6 py-3 bg-[#d4b896] text-black font-medium rounded-md hover:bg-[#c4a886] transition-all cursor-pointer"
           >
             + New Tour
           </button>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
-          <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
+        <div className="flex gap-4 mb-8 overflow-x-auto pb-2">
+          <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 min-w-48">
             <p className="text-gray-400 text-sm mb-2">Total Tours</p>
             <p className="text-4xl font-bold mb-1">{totalTours}</p>
             <p className="text-gray-500 text-sm">All time</p>
           </div>
-          <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
+          <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 min-w-48">
             <p className="text-gray-400 text-sm mb-2">Total Views</p>
             <p className="text-4xl font-bold mb-1">{activeUsers.toLocaleString()}</p>
             <p className="text-gray-500 text-sm">Across all tours</p>
           </div>
-          <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
+          <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 min-w-48">
             <p className="text-gray-400 text-sm mb-2">Avg Completion</p>
             <p className="text-4xl font-bold mb-1">{avgCompletion}%</p>
             <p className="text-gray-500 text-sm">Across all tours</p>
@@ -214,7 +201,7 @@ export default function Dashboard() {
         </div>
 
         {/* Search & Filters */}
-        <div className="flex gap-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
           <input
             type="text"
             placeholder="Search tours..."
@@ -249,59 +236,69 @@ export default function Dashboard() {
         ) : (
           <div className="space-y-4">
             {filteredTours.map((tour) => (
-              <div key={tour.id} className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
+              <div key={tour.id} className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 overflow-hidden">
                 <div className="flex items-start justify-between mb-4">
-                  <div>
+                  <div className="flex-1 min-w-0 pr-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <h3 className="text-xl font-bold">{tour.title}</h3>
-                      <span className={`px-2 py-1 text-xs rounded ${
+                      <h3 className="text-xl font-bold truncate">{tour.title}</h3>
+                      <span className={`px-2 py-1 text-xs rounded whitespace-nowrap ${
                         tour.status === 'active' 
                           ? 'bg-green-500/20 text-green-500' 
                           : 'bg-gray-500/20 text-gray-400'
                       }`}>
                         {tour.status === 'active' ? 'Active' : 'Draft'}
                       </span>
-                      {tour.is_featured && (
-                        <span className="px-2 py-1 bg-[#d4b896]/20 text-[#d4b896] text-xs rounded">Featured</span>
-                      )}
-                      {tour.is_high_priority && (
-                        <span className="px-2 py-1 bg-orange-500/20 text-orange-500 text-xs rounded">High Priority</span>
-                      )}
                     </div>
-                    <p className="text-gray-400 text-sm">{tour.description || 'No description'}</p>
+                    <p className="text-gray-400 text-sm truncate">{tour.description || 'No description'}</p>
                   </div>
+                  <button 
+                    onClick={() => setDeleteModal({isOpen: true, tourId: tour.id, tourTitle: tour.title})}
+                    className="text-red-500 hover:text-red-400 cursor-pointer p-1 flex-shrink-0"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
                 </div>
-                <div className="grid grid-cols-4 gap-6 mb-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                   <div>
-                    <p className="text-2xl font-bold">{tour.views > 0 ? tour.views.toLocaleString() : '—'}</p>
+                    <p className="text-xl font-bold truncate">{tour.views > 0 ? tour.views.toLocaleString() : '—'}</p>
                     <p className="text-gray-500 text-sm">views</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">
+                    <p className="text-xl font-bold truncate">
                       {tour.views > 0 ? `${Math.round((tour.completions / tour.views) * 100)}%` : '—'}
                     </p>
                     <p className="text-gray-500 text-sm">completed</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{tour.avg_time > 0 ? formatTime(tour.avg_time) : '—'}</p>
+                    <p className="text-xl font-bold truncate">{tour.avg_time > 0 ? formatTime(tour.avg_time) : '—'}</p>
                     <p className="text-gray-500 text-sm">avg time</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{tour.rating > 0 ? tour.rating.toFixed(1) : '—'}</p>
+                    <p className="text-xl font-bold truncate">{tour.rating > 0 ? tour.rating.toFixed(1) : '—'}</p>
                     <p className="text-gray-500 text-sm">rating</p>
                   </div>
                 </div>
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-gray-500 text-sm">Created: {formatDate(tour.created_at)}</p>
-                  <p className="text-gray-500 text-sm">Last edited: {getTimeAgo(tour.updated_at)}</p>
-                  <p className="text-gray-500 text-sm">{tour.steps?.length || 0} steps</p>
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-2">
+                  <div className="flex flex-col md:flex-row gap-2 text-gray-500 text-sm">
+                    <span>Created: {formatDate(tour.created_at)}</span>
+                    <span>Last edited: {getTimeAgo(tour.updated_at)}</span>
+                    <span>{tour.steps?.length || 0} steps</span>
+                  </div>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   <button 
                     onClick={() => router.push(`/dashboard/tours/${tour.id}/edit`)}
                     className="px-4 py-2 bg-[#d4b896] text-black font-medium rounded-md hover:bg-[#c4a886] transition-all cursor-pointer"
                   >
                     Edit
+                  </button>
+                  <button 
+                    onClick={() => handleGenerateEmbed(tour)}
+                    className="px-4 py-2 border border-[#d4b896] text-[#d4b896] rounded-md hover:bg-[#d4b896]/10 transition-all cursor-pointer"
+                  >
+                    Get Embed Code
                   </button>
                   {tour.status === 'draft' ? (
                     <button 
@@ -318,24 +315,34 @@ export default function Dashboard() {
                       Analytics
                     </button>
                   )}
-                  <button 
-                    onClick={() => handleDuplicate(tour)}
-                    className="px-4 py-2 border border-[#2a2a2a] text-white rounded-md hover:bg-[#1a1a1a] transition-all cursor-pointer"
-                  >
-                    Duplicate
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(tour.id)}
-                    className="px-4 py-2 border border-red-500/50 text-red-500 rounded-md hover:bg-red-500/10 transition-all cursor-pointer"
-                  >
-                    Delete
-                  </button>
                 </div>
               </div>
             ))}
           </div>
         )}
       </main>
+
+      {/* Delete Modal */}
+      <Modal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({isOpen: false, tourId: '', tourTitle: ''})}
+        onConfirm={() => handleDelete(deleteModal.tourId)}
+        title="Delete Tour"
+        message={`Are you sure you want to delete "${deleteModal.tourTitle}"? This action cannot be undone.`}
+        confirmText="Delete"
+        confirmColor="bg-red-500 hover:bg-red-600"
+      />
+
+      {/* Logout Modal */}
+      <Modal
+        isOpen={logoutModal}
+        onClose={() => setLogoutModal(false)}
+        onConfirm={handleLogout}
+        title="Logout"
+        message="Are you sure you want to logout?"
+        confirmText="Logout"
+        confirmColor="bg-[#d4b896] hover:bg-[#c4a886]"
+      />
     </div>
   );
 }
