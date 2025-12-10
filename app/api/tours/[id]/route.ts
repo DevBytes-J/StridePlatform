@@ -3,13 +3,15 @@ import { supabase } from '@/lib/supabase';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     const { data: tours, error } = await supabase
       .from('tours')
       .select('*')
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) {
       return NextResponse.json({ 
@@ -21,7 +23,7 @@ export async function GET(
     if (!tours || tours.length === 0) {
       return NextResponse.json({ 
         error: 'Tour not found',
-        tourId: params.id
+        tourId: id
       }, { status: 404 });
     }
 
